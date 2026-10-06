@@ -1,0 +1,17 @@
+{
+  "name": "LARP Wallet",
+  "short_name": "LARP",
+  "description": "A customizable novelty wallet simulator for content and roleplay. No real money, payments, cards, or credentials.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0b0d",
+  "theme_color": "#0a0a0b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

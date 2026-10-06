@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="LARP Wallet" />
+  <meta name="description" content="A customizable novelty wallet simulator for content and roleplay. No real money, payments, cards, or credentials." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>LARP Wallet</title>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar" id="holdZone">
+      <div class="brand">
+        <div class="brand-mark">LW</div>
+        <div>
+          <div class="brand-title">LARP Wallet</div>
+          <div class="brand-sub">novelty simulator</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="searchBtn" aria-label="Search cards">⌕</button>
+        <button class="icon-btn" id="settingsBtn" aria-label="Customize wallet">•••</button>
+      </div>
+      <div class="hold-progress" id="holdProgress"></div>
+    </header>
+
+    <main>
+      <section class="hero-row">
+        <div>
+          <h1 id="walletTitle">Fabian's Wallet</h1>
+          <p id="walletSubtitle">A fictional wallet for content, demos and LARP.</p>
+        </div>
+        <button class="add-btn" id="addCardBtn" aria-label="Add card">+</button>
+      </section>
+
+      <div class="demo-banner" id="demoBanner">
+        <span class="demo-dot"></span>
+        SIMULATION • NO REAL MONEY OR PAYMENT FUNCTION
+      </div>
+
+      <section class="toolbar">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="premium">Premium</button>
+        <button class="chip" data-filter="travel">Travel</button>
+        <button class="chip" data-filter="event">Passes</button>
+        <button class="chip" data-filter="lifestyle">Lifestyle</button>
+      </section>
+
+      <section class="wallet-stack" id="walletStack" aria-live="polite"></section>
+      <div class="empty-state hidden" id="emptyState">
+        <div class="empty-icon">◇</div>
+        <h2>No cards here</h2>
+        <p>Add a card or change the filter.</p>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="walletTab"><span>▰</span><small>Wallet</small></button>
+      <button class="nav-item" id="editTab"><span>✦</span><small>Customize</small></button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modalBackdrop"></div>
+
+  <section class="sheet hidden" id="settingsSheet" aria-modal="true" role="dialog">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div><h2>Backstage</h2><p>Customize the whole simulator.</p></div>
+      <button class="icon-btn" data-close-sheet>×</button>
+    </div>
+
+    <div class="segmented" id="settingsTabs">
+      <button class="seg active" data-tab="wallet">Wallet</button>
+      <button class="seg" data-tab="card">Card</button>
+      <button class="seg" data-tab="data">Backup</button>
+    </div>
+
+    <div class="sheet-body tab-panel" data-panel="wallet">
+      <label>Wallet title<input id="settingWalletTitle" maxlength="34" /></label>
+      <label>Subtitle<input id="settingWalletSubtitle" maxlength="90" /></label>
+      <label>Theme<select id="settingTheme"><option value="dark">Dark</option><option value="light">Light</option><option value="auto">System</option></select></label>
+      <label>Card spacing<input type="range" id="settingSpacing" min="16" max="88" step="2" /></label>
+      <label>Card corners<input type="range" id="settingRadius" min="14" max="34" step="1" /></label>
+      <label>Stack depth<input type="range" id="settingScale" min="92" max="100" step="1" /></label>
+      <label class="switch-row"><span>Photo overlay</span><input type="checkbox" id="settingOverlay" checked /></label>
+      <p class="safety-note">The “SIMULATION” label stays visible by design. This project intentionally has no payment, transaction, receipt, or real credential features.</p>
+    </div>
+
+    <div class="sheet-body tab-panel hidden" data-panel="card">
+      <div id="cardEditorEmpty" class="editor-empty">Open a card, then edit it here.</div>
+      <div id="cardEditor" class="hidden">
+        <label>Card title<input id="editTitle" maxlength="34" /></label>
+        <label>Subtitle<input id="editSubtitle" maxlength="48" /></label>
+        <label>Footer / message<input id="editFooter" maxlength="52" /></label>
+        <label>Last four<input id="editLast4" inputmode="numeric" maxlength="4" /></label>
+        <label>Category<select id="editCategory"><option>premium</option><option>travel</option><option>event</option><option>lifestyle</option></select></label>
+        <label>Text color<input type="color" id="editTextColor" /></label>
+        <label>Accent color<input type="color" id="editAccent" /></label>
+        <label>Background image URL<input id="editImage" placeholder="https://..." /></label>
+        <label>Gradient<input id="editGradient" placeholder="linear-gradient(...)" /></label>
+        <div class="button-row"><button class="secondary" id="duplicateCard">Duplicate</button><button class="danger" id="deleteCard">Delete</button></div>
+      </div>
+    </div>
+
+    <div class="sheet-body tab-panel hidden" data-panel="data">
+      <button class="primary wide" id="exportBtn">Export wallet JSON</button>
+      <label>Import wallet JSON<textarea id="importBox" rows="8" placeholder="Paste exported JSON here"></textarea></label>
+      <button class="secondary wide" id="importBtn">Import</button>
+      <button class="danger wide" id="resetBtn">Reset to starter deck</button>
+    </div>
+  </section>
+
+  <section class="detail-view hidden" id="detailView" aria-modal="true" role="dialog">
+    <header class="detail-top">
+      <button class="icon-btn glass" id="detailBack">‹</button>
+      <div class="detail-badge">SIMULATION</div>
+      <button class="icon-btn glass" id="detailEdit">•••</button>
+    </header>
+    <div class="detail-card-wrap" id="detailCardWrap"></div>
+    <div class="detail-info" id="detailInfo"></div>
+    <div class="detail-actions">
+      <button class="detail-action" id="moveUp">↑<span>Move up</span></button>
+      <button class="detail-action" id="moveDown">↓<span>Move down</span></button>
+      <button class="detail-action" id="detailDuplicate">⧉<span>Duplicate</span></button>
+    </div>
+    <p class="detail-disclaimer">Visual prop only. No real account, money, card, issuer, credential, barcode, or payment capability.</p>
+  </section>
+
+  <section class="search-overlay hidden" id="searchOverlay">
+    <div class="search-head"><button class="icon-btn" id="searchClose">‹</button><input id="searchInput" placeholder="Search cards" autofocus /></div>
+    <div class="search-results" id="searchResults"></div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
